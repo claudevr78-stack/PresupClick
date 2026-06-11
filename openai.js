@@ -1,4 +1,4 @@
-const OPENAI_API_KEY = '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';
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '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';
 
 export async function analyzeChantier(imageUris, description, tradeType) {
   const imageContents = imageUris.map(uri => ({
