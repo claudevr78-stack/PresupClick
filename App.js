@@ -260,19 +260,12 @@ function PaywallScreen({ daysLeft }) {
     setLoadingPlan(plan);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      const priceId = plan === 'lifetime' ? PRICE_LIFETIME : PRICE_MONTHLY;
-      const mode = plan === 'lifetime' ? 'payment' : 'subscription';
-      const response = await fetch('https://presupclick-backend.vercel.app/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId, mode, email: user?.email || '' }),
-      });
-      const session = await response.json();
-      if (session.url) {
-        await Linking.openURL(session.url);
-      } else {
-        Alert.alert('Error', session.error || 'No se pudo crear la sesión.');
-      }
+      const email = user?.email || '';
+      const baseUrl = isMexico 
+        ? 'https://presupclick-backend.vercel.app/subscribe-mx'
+        : 'https://presupclick-backend.vercel.app/subscribe';
+      const url = `${baseUrl}?plan=${plan}&email=${encodeURIComponent(email)}`;
+      await Linking.openURL(url);
     } catch (e) {
       Alert.alert('Error', e.message);
     } finally {
