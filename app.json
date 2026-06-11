@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "DevisClic",
+    "slug": "presupclick",
+    "version": "1.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f0f0f"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "requiresFullScreen": true,
+      "bundleIdentifier": "com.batismart.devisexpress",
+      "buildNumber": "4",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIDeviceFamily": [
+          1
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0f0f0f"
+      },
+      "package": "com.batismart.devisexpress",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7bc26d76-23be-4d40-a872-39bff05671c8"
+      }
+    },
+    "owner": "lavill",
+    "plugins": [
+      "expo-localization",
+      "expo-mail-composer"
+    ]
+  }
+}
