@@ -1,4 +1,4 @@
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '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';
+const OPENAI_API_KEY = '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';
 
 export async function analyzeChantier(imageUris, description, tradeType) {
   const imageContents = imageUris.map(uri => ({
@@ -6,20 +6,21 @@ export async function analyzeChantier(imageUris, description, tradeType) {
     image_url: { url: uri, detail: 'high' }
   }));
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o',
-      max_tokens: 2000,
-      temperature: 0.2,
-      messages: [
-        {
-          role: 'system',
-          content: `Eres un experto en presupuestos de obras y reformas en España y México, con 20 años de experiencia trabajando con albañiles, electricistas, fontaneros, pintores y otros profesionales de la construcción.
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        max_tokens: 2000,
+        temperature: 0.2,
+        messages: [
+          {
+            role: 'system',
+            content: `Eres un experto en presupuestos de obras y reformas en España y México, con 20 años de experiencia trabajando con albañiles, electricistas, fontaneros, pintores y otros profesionales de la construcción.
 
 Conoces profundamente:
 - Los precios reales del mercado español y mexicano 2025-2026
@@ -68,14 +69,14 @@ ANÁLISIS DE FOTOS:
 - Identifica materiales existentes que pueden reutilizarse
 
 IMPORTANTE: Responde ÚNICAMENTE con el JSON puro, sin texto antes ni después, sin markdown, sin comillas invertidas. Usa EXACTAMENTE las claves del formato solicitado por el usuario.`
-        },
-        {
-          role: 'user',
-          content: [
-            ...imageContents,
-            {
-              type: 'text',
-              text: `Tipo de trabajo: ${tradeType}
+          },
+          {
+            role: 'user',
+            content: [
+              ...imageContents,
+              {
+                type: 'text',
+                text: `Tipo de trabajo: ${tradeType}
 Descripción: ${description}
 
 Responde ÚNICAMENTE en JSON válido sin markdown:
@@ -96,16 +97,20 @@ Responde ÚNICAMENTE en JSON válido sin markdown:
     }
   ]
 }`
-            }
-          ]
-        }
-      ]
-    })
-  });
-
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  const content = data.choices[0].message.content;
-  const cleaned = content.replace(/```json|```/g, '').trim();
-  return JSON.parse(cleaned);
+              }
+            ]
+          }
+        ]
+      })
+    });
+    const data = await response.json();
+    console.log('OpenAI response:', JSON.stringify(data));
+    if (data.error) throw new Error(data.error.message);
+    const content = data.choices[0].message.content;
+    const cleaned = content.replace(/```json|```/g, '').trim();
+    return JSON.parse(cleaned);
+  } catch (e) {
+    console.log('FETCH ERROR:', e.message);
+    throw e;
+  }
 }
