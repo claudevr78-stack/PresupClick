@@ -133,7 +133,31 @@ export function ProfileScreen({ onShowPaywall }) {
       { text: 'Cerrar sesión', style: 'destructive', onPress: () => supabase.auth.signOut() },
     ]);
   }
-
+async function handleDeleteAccount() {
+    Alert.alert(
+      'Eliminar cuenta',
+      '¿Estás seguro de que quieres eliminar tu cuenta? Todos tus datos se perderán permanentemente.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar cuenta',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const { data: { user } } = await supabase.auth.getUser();
+              await supabase.from('quotes').delete().eq('user_id', user.id);
+              await supabase.from('invoices').delete().eq('user_id', user.id);
+              await supabase.from('profiles').delete().eq('user_id', user.id);
+              await supabase.auth.signOut();
+              Alert.alert('✅ Cuenta eliminada', 'Tu cuenta ha sido eliminada con éxito.');
+            } catch (e) {
+              Alert.alert('Error', e.message);
+            }
+          }
+        }
+      ]
+    );
+  }
   const set = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
 
   if (loading) return (
@@ -228,8 +252,12 @@ export function ProfileScreen({ onShowPaywall }) {
         )}
       </View>
 
-      <TouchableOpacity style={[styles.button, { backgroundColor: '#1a3050', marginBottom: 40 }]} onPress={handleLogout}>
+      <TouchableOpacity style={[styles.button, { backgroundColor: '#1a3050', marginBottom: 16 }]} onPress={handleLogout}>
         <Text style={[styles.buttonText, { color: '#ef4444' }]}>Cerrar sesión</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.button, { backgroundColor: '#1a0a0a', marginBottom: 40, borderWidth: 1, borderColor: '#ef4444' }]} onPress={handleDeleteAccount}>
+        <Text style={[styles.buttonText, { color: '#ef4444' }]}>🗑️ Eliminar mi cuenta</Text>
       </TouchableOpacity>
     </ScrollView>
   );
