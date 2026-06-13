@@ -12,8 +12,11 @@
     },
     "production": {
       "env": {
-        "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
-        "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx4096m"
+        "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+      },
+      "android": {
+        "gradleCommand": ":app:bundleRelease",
+        "buildType": "app-bundle"
       }
     }
   },
