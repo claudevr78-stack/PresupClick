@@ -13,6 +13,7 @@ import * as SMS from 'expo-sms';
 import * as StoreReview from 'expo-store-review';
 import i18n, { loadLanguage } from './translations';
 import { Svg, Path } from 'react-native-svg';
+import * as IAPurchase from 'expo-in-app-purchases';
 
 const PRICE_MONTHLY_ES = 'price_1Th8PGQxYPNEtUDqJBq5O4FB';
 const PRICE_LIFETIME_ES = 'price_1Th8QpQxYPNEtUDqfroddHhf';
@@ -259,16 +260,46 @@ function PaywallScreen({ daysLeft }) {
   async function handleSubscribe(plan) {
     setLoadingPlan(plan);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      const email = user?.email || '';
-      const baseUrl = isMexico 
-        ? 'https://presupclick-backend.vercel.app/subscribe-mx'
-        : 'https://presupclick-backend.vercel.app/subscribe';
-      const url = `${baseUrl}?plan=${plan}&email=${encodeURIComponent(email)}`;
-      await Linking.openURL(url);
+      if (Platform.OS === 'android') {
+        const { data: { user } } = await supabase.auth.getUser();
+        const email = user?.email || '';
+        const baseUrl = isMexico 
+          ? 'https://presupclick-backend.vercel.app/subscribe-mx'
+          : 'https://presupclick-backend.vercel.app/subscribe';
+        const url = `${baseUrl}?plan=${plan}&email=${encodeURIComponent(email)}`;
+        await Linking.openURL(url);
+        return;
+      }
+
+      await IAPurchase.connectAsync();
+      const productId = plan === 'lifetime'
+        ? 'com.maisonlaville.presupclick.lifetime'
+        : 'com.maisonlaville.presupclick.monthly';
+      const products = await IAPurchase.getProductsAsync([productId]);
+      if (products.length === 0) {
+        Alert.alert('Error', 'Producto no disponible.');
+        return;
+      }
+      const { responseCode, results } = await IAPurchase.purchaseItemAsync(productId);
+      if (responseCode === IAPurchase.IAPResponseCode.OK) {
+        const purchase = results[0];
+        const { data: { user } } = await supabase.auth.getUser();
+        await supabase.from('profiles').update({
+          is_paid: true,
+          stripe_subscription_id: purchase.transactionId,
+        }).eq('user_id', user.id);
+        await IAPurchase.finishTransactionAsync(purchase, true);
+        Alert.alert('✅ ¡Gracias!', '¡Tu suscripción ha sido activada!');
+        setIsPaid(true);
+      } else if (responseCode === IAPurchase.IAPResponseCode.USER_CANCELED) {
+        // Cancelado
+      } else {
+        Alert.alert('Error', 'Compra no completada.');
+      }
     } catch (e) {
       Alert.alert('Error', e.message);
     } finally {
+      if (Platform.OS === 'ios') await IAPurchase.disconnectAsync();
       setLoadingPlan(null);
     }
   }
