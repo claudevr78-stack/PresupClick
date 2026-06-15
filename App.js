@@ -254,8 +254,8 @@ function PaywallScreen({ daysLeft }) {
 
   const PRICE_MONTHLY = isMexico ? PRICE_MONTHLY_MX : PRICE_MONTHLY_ES;
   const PRICE_LIFETIME = isMexico ? PRICE_LIFETIME_MX : PRICE_LIFETIME_ES;
-  const monthlyPrice = isMexico ? '149 MXN' : '12,99€';
-  const lifetimePrice = isMexico ? '549 MXN' : '49€';
+  const monthlyPrice = isMexico ? '129 MXN' : '12,99€';
+const lifetimePrice = isMexico ? '499 MXN' : '49,99€';
 
   async function handleSubscribe(plan) {
     setLoadingPlan(plan);
