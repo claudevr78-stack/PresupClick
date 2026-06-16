@@ -13,7 +13,12 @@ import * as SMS from 'expo-sms';
 import * as StoreReview from 'expo-store-review';
 import i18n, { loadLanguage } from './translations';
 import { Svg, Path } from 'react-native-svg';
-import * as IAPurchase from 'expo-in-app-purchases';
+import { Platform } from 'react-native';
+
+let IAPurchase;
+if (Platform.OS === 'ios') {
+  IAPurchase = require('expo-in-app-purchases');
+}
 
 const PRICE_MONTHLY_ES = 'price_1Th8PGQxYPNEtUDqJBq5O4FB';
 const PRICE_LIFETIME_ES = 'price_1Th8QpQxYPNEtUDqfroddHhf';
