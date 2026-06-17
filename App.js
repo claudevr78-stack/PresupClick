@@ -13,7 +13,6 @@ import * as SMS from 'expo-sms';
 import * as StoreReview from 'expo-store-review';
 import i18n, { loadLanguage } from './translations';
 import { Svg, Path } from 'react-native-svg';
-import { Platform } from 'react-native';
 
 let IAPurchase;
 if (Platform.OS === 'ios') {
