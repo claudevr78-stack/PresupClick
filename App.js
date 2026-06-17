@@ -289,10 +289,18 @@ const lifetimePrice = isMexico ? '499 MXN' : '49,99€';
       if (responseCode === IAPurchase.IAPResponseCode.OK) {
         const purchase = results[0];
         const { data: { user } } = await supabase.auth.getUser();
-        await supabase.from('profiles').update({
-          is_paid: true,
-          stripe_subscription_id: purchase.transactionId,
-        }).eq('user_id', user.id);
+        const confirmResponse = await fetch('https://presupclick-backend.vercel.app/api/confirm-purchase', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.id,
+            transactionId: purchase.transactionId,
+            plan: plan,
+          }),
+        });
+        if (!confirmResponse.ok) {
+          throw new Error('Error al confirmar la compra en el servidor');
+        }
         await IAPurchase.finishTransactionAsync(purchase, true);
         Alert.alert('✅ ¡Gracias!', '¡Tu suscripción ha sido activada!');
         setIsPaid(true);

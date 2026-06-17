@@ -16,7 +16,7 @@
       "supportsTablet": false,
       "requiresFullScreen": true,
       "bundleIdentifier": "com.maisonlaville.presupclick",
-      "buildNumber": "5",
+      "buildNumber": "6",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "UIDeviceFamily": [1],
