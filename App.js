@@ -381,6 +381,14 @@ const lifetimePrice = isMexico ? '499 MXN' : '49,99€';
           {loadingPlan === 'lifetime' ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>Comprar de por vida — {lifetimePrice} →</Text>}
         </TouchableOpacity>
       </View>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 16, marginBottom: 12 }}>
+        <TouchableOpacity onPress={() => Linking.openURL('https://presupclick-backend.vercel.app/privacy')}>
+          <Text style={{ color: '#4a80f0', fontSize: 12, textDecorationLine: 'underline' }}>Política de Privacidad</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
+          <Text style={{ color: '#4a80f0', fontSize: 12, textDecorationLine: 'underline' }}>Términos de Uso</Text>
+        </TouchableOpacity>
+      </View>
       <Text style={{ color: '#444', fontSize: 12, textAlign: 'center', marginBottom: 40 }}>
         Pago seguro por Stripe • Cancela cuando quieras
       </Text>
