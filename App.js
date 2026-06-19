@@ -381,6 +381,37 @@ const lifetimePrice = isMexico ? '499 MXN' : '49,99€';
           {loadingPlan === 'lifetime' ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>Comprar de por vida — {lifetimePrice} →</Text>}
         </TouchableOpacity>
       </View>
+      <TouchableOpacity
+        style={{ padding: 14, alignItems: 'center', marginBottom: 8 }}
+        onPress={async () => {
+          if (Platform.OS !== 'ios') return;
+          try {
+            await IAPurchase.connectAsync();
+            const history = await IAPurchase.getPurchaseHistoryAsync();
+            if (history && history.results && history.results.length > 0) {
+              const { data: { user } } = await supabase.auth.getUser();
+              await fetch('https://presupclick-backend.vercel.app/api/confirm-purchase', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userId: user.id,
+                  transactionId: history.results[0].transactionId,
+                  plan: 'restore',
+                }),
+              });
+              Alert.alert('✅ ¡Compra restaurada!', 'Tu acceso Premium ha sido reactivado.');
+            } else {
+              Alert.alert('Sin compras', 'No se encontraron compras anteriores.');
+            }
+          } catch (e) {
+            Alert.alert('Error', e.message);
+          } finally {
+            if (Platform.OS === 'ios') await IAPurchase.disconnectAsync();
+          }
+        }}
+      >
+        <Text style={{ color: '#7a9cc0', fontSize: 13 }}>Restaurar compras</Text>
+      </TouchableOpacity>
       <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 16, marginBottom: 12 }}>
         <TouchableOpacity onPress={() => Linking.openURL('https://presupclick-backend.vercel.app/privacy')}>
           <Text style={{ color: '#4a80f0', fontSize: 12, textDecorationLine: 'underline' }}>Política de Privacidad</Text>
